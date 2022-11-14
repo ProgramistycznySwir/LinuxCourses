@@ -1,13 +1,30 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
 
-builder.UseSerilog((context, configuration) => {
+// Configuring logging:
+builder.Logging.ClearProviders();
+// builder.Logging.AddSerilog(
+//     new LoggerConfiguration()
+//         .WriteTo.Console()
+//         .ReadFrom.Configuration(builder.Configuration)
+//         // .WriteTo.File("./LinuxCourses.log")
+//         .CreateLogger()
+//     );
+builder.Host.UseSerilog((context, configuration) => {
     configuration
         .WriteTo.Console()
-        .WriteTo.ElasticSearch(new ElasticSearchSinkOptions());
+        .ReadFrom.Configuration(builder.Configuration)
+        // .WriteTo.File("./LinuxCourses.log")
+        ;
 });
 
 var app = builder.Build();
@@ -22,7 +39,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 
 app.MapControllerRoute(
     name: "default",
