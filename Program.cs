@@ -4,6 +4,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+builder.UseSerilog((context, configuration) => {
+    configuration
+        .WriteTo.Console()
+        .WriteTo.ElasticSearch(new ElasticSearchSinkOptions());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

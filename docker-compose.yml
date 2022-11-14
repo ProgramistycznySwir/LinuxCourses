@@ -1,0 +1,68 @@
+version: '3.5'
+
+services:
+  # app:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "7005"
+  #   depends_on:
+  #     - db-server
+  #   networks:
+  #     - localdev
+
+  db-server:
+    image: mongo
+    container_name: LinuxCourses_mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=AzureDiamond
+      - MONGO_INITDB_ROOT_PASSWORD=hunter2
+    volumes:
+      - data_db:/mongodb/db/
+    ports:
+      - 27017:27017
+    networks:
+      - localdev
+
+  logging-es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
+    container_name: LinuxCourses_es01
+    environment:
+      - node.name=LinuxCourses_es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=LinuxCourses_es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  logging-kibana:
+    image: docker.elastic.co/kibana/kibana:8.5.0
+    container_name: LinuxCourses_kib01
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://LinuxCourses_es01:9200
+      ELASTICSEARCH_HOSTS: http://LinuxCourses_es01:9200
+    networks:
+      - elastic
+
+volumes:
+  data_db:
+    driver: local
+  data01:
+    driver: local
+
+networks:
+  localdev:
+    driver: bridge
+  elastic:
+    driver: bridge
