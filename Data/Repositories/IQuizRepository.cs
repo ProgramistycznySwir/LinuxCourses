@@ -20,13 +20,9 @@ public class QuizRepository : IQuizRepository
 {
 	private readonly IMongoCollection<Quiz> _quizes;
 
-	public QuizRepository(
-		IOptions<LinuxCoursesDatabaseSettings> bookStoreDatabaseSettings)
+	public QuizRepository(IMongoDb mongo)
 	{
-		var settings = bookStoreDatabaseSettings.Value;
-		var mongoClient_ = new MongoClient(settings.ConnectionString);
-		var mongoDatabase_ = mongoClient_.GetDatabase(settings.DatabaseName);
-		_quizes = mongoDatabase_.GetCollection<Quiz>(settings.Quizes);
+		_quizes = mongo.Quizes();
 	}
 
 	public async Task<List<Quiz>> GetAllAsync() =>

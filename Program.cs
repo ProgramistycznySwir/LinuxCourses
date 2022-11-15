@@ -1,9 +1,13 @@
+using System.Text;
 using LinuxCourses.Data;
 using LinuxCourses.Data.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using Serilog;
 
 var bob = WebApplication.CreateBuilder(args);
@@ -14,11 +18,31 @@ bob.Services.Configure<LinuxCoursesDatabaseSettings>(
         bob.Configuration.GetSection("Db_Main")
     );
 MongoDB.Bson.BsonDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
+bob.Services.AddScoped<IMongoDb, MongoDb>();
 
 // Repositories:
 {
     bob.Services.AddTransient<IQuizRepository, QuizRepository>();
 }
+
+bob.Services.AddAuthentication(opt => {
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "https://localhost:5001",
+            ValidAudience = "https://localhost:5001",
+            // TODO ULTRA: Replace this secret key with some propper value!
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+        };
+    });
 
 bob.Services.AddControllersWithViews();
 
