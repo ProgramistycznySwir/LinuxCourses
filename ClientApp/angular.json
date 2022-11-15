@@ -129,5 +129,8 @@
       }
     }
   },
-  "defaultProject": "LinuxCourses"
+  "defaultProject": "LinuxCourses",
+  "cli": {
+    "analytics": false
+  }
 }

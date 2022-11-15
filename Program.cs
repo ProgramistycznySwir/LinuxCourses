@@ -1,33 +1,38 @@
+using LinuxCourses.Data;
+using LinuxCourses.Data.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+var bob = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Database:
+bob.Services.Configure<LinuxCoursesDatabaseSettings>(
+        bob.Configuration.GetSection("Db_Main")
+    );
+MongoDB.Bson.BsonDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
 
-builder.Services.AddControllersWithViews();
+// Repositories:
+{
+    bob.Services.AddTransient<IQuizRepository, QuizRepository>();
+}
+
+bob.Services.AddControllersWithViews();
 
 // Configuring logging:
-builder.Logging.ClearProviders();
-// builder.Logging.AddSerilog(
-//     new LoggerConfiguration()
-//         .WriteTo.Console()
-//         .ReadFrom.Configuration(builder.Configuration)
-//         // .WriteTo.File("./LinuxCourses.log")
-//         .CreateLogger()
-//     );
-builder.Host.UseSerilog((context, configuration) => {
-    configuration
-        .WriteTo.Console()
-        .ReadFrom.Configuration(builder.Configuration)
-        // .WriteTo.File("./LinuxCourses.log")
-        ;
-});
+bob.Logging.ClearProviders();
+bob.Host.UseSerilog((context, configuration) => {
+        configuration
+            .WriteTo.Console()
+            .ReadFrom.Configuration(bob.Configuration)
+            .WriteTo.File("./LinuxCourses.log")
+            ;
+    });
 
-var app = builder.Build();
+var app = bob.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -35,6 +40,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
