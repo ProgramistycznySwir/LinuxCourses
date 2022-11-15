@@ -62,6 +62,9 @@ bob.Host.UseSerilog((context, configuration) => {
             ;
     });
 
+bob.Services.AddEndpointsApiExplorer();
+bob.Services.AddSwaggerGen();
+
 
 
 var app = bob.Build();
@@ -91,5 +94,11 @@ app.MapControllers()
     .RequireAuthorization();
 
 app.MapFallbackToFile("index.html");
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.Run();
