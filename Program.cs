@@ -2,13 +2,19 @@ using System.Text;
 using LinuxCourses.Data;
 using LinuxCourses.Data.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
+using MongoDB.Driver.Core.Events;
 using Serilog;
+
+const string ApiUrl = "https://localhost:7005";
+
+
 
 var bob = WebApplication.CreateBuilder(args);
 
@@ -37,8 +43,8 @@ bob.Services.AddAuthentication(opt => {
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://localhost:5001",
-            ValidAudience = "https://localhost:5001",
+            ValidIssuer = ApiUrl,
+            ValidAudience = ApiUrl,
             // TODO ULTRA: Replace this secret key with some propper value!
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
         };
@@ -56,6 +62,8 @@ bob.Host.UseSerilog((context, configuration) => {
             ;
     });
 
+
+
 var app = bob.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,15 +73,23 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+
 app.UseStaticFiles();
 app.UseRouting();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
+app.UseAuthorization();
 
-app.MapFallbackToFile("index.html");;
+app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller}/{action=Index}/{id?}"
+    )
+    .RequireAuthorization();
+app.MapControllers()
+    .RequireAuthorization();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
