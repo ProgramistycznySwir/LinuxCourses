@@ -26,7 +26,6 @@ public class AuthController : ControllerBase
 {
     const string ApiUrl = "https://localhost:7005";
 
-
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginModel user)
     {

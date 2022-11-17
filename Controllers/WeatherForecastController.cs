@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using LinuxCourses.Data.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 

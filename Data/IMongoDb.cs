@@ -10,6 +10,7 @@ namespace LinuxCourses.Data;
 public interface IMongoDb
 {
 	IMongoCollection<Quiz> Quizes();
+	IMongoCollection<Course> Courses();
 }
 
 public class MongoDb : IMongoDb
@@ -29,4 +30,7 @@ public class MongoDb : IMongoDb
 
 	public IMongoCollection<Quiz> Quizes()
 		=> _mongo.GetCollection<Quiz>(_settings.Quizes);
+
+	public IMongoCollection<Course> Courses()
+		=> _mongo.GetCollection<Course>(_settings.Courses);
 }
