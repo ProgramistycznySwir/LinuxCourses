@@ -2,6 +2,7 @@ using System.Text;
 using LinuxCourses.Auth;
 using LinuxCourses.Data;
 using LinuxCourses.Data.Services;
+using LinuxCourses.Features.Auth;
 using LinuxCourses.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,15 +38,18 @@ bob.Services.AddScoped<IMongoDb, MongoDb>();
 {
     bob.Services.AddTransient<IQuizRepository, QuizRepository>();
 }
+AppJwtSettings settings_Jwt = new();
+bob.Configuration.Bind("JwtSettings", settings_Jwt);
+bob.Services.AddSingleton(settings_Jwt);
 
-LinuxCoursesDatabaseSettings settings = new();
-bob.Configuration.Bind("Db_Main", settings);
+LinuxCoursesDatabaseSettings settings_Db = new();
+bob.Configuration.Bind("Db_Main", settings_Db);
 
 
 bob.Services.AddIdentity<User, AppRole>()
         .AddMongoDbStores<User, AppRole, Guid> (
-            settings.ConnectionString,
-            settings.DatabaseName
+            settings_Db.ConnectionString,
+            settings_Db.DatabaseName
         );
 
 bob.Services.AddAuthentication(opt => {
@@ -57,18 +61,21 @@ bob.Services.AddAuthentication(opt => {
     {
         opt.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
+            RequireExpirationTime = false,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = ApiUrl,
-            ValidAudience = ApiUrl,
+            // ValidIssuer = ApiUrl,
+            // ValidAudience = ApiUrl,
             // TODO ULTRA: Replace this secret key with some propper value!
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSecret))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(settings_Jwt.Secret))
         };
     });
 
 bob.Services.AddMediatR(typeof(Program));
+
+bob.Services.AddTransient<ITokenService, TokenService>();
 
 bob.Services.AddControllersWithViews();
 
@@ -84,37 +91,32 @@ bob.Host.UseSerilog((context, configuration) => {
 
 bob.Services.AddEndpointsApiExplorer();
 bob.Services.AddSwaggerGen(x => {
-    // x.SwaggerDoc("v1", new OpenApiInfo { Title= "LinuxCourses API", Version= "v1" });
+    x.SwaggerDoc("v1", new OpenApiInfo { Title= "LinuxCourses API", Version= "v1" });
 
-    // // var security = new OpenApiSecurityRequirement(); new Dictionary<string, IEnumerable<string>> {
-    // //         { "Bearer", new string[0] }
-    // //     };
-    // x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
-    //     Description = "JWT",
-    //     Name = "Auth",
-    //     In = ParameterLocation.Header,
-    //     Type = SecuritySchemeType.ApiKey
-    // });
-    // // x.AddSecurityRequirement(security);
+    x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+        Description = "JWT",
+        Name = "Auth",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+    x.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "Bearer",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
 
-    // x.AddSecurityRequirement(new OpenApiSecurityRequirement
-    //             {
-    //                 {
-    //                     new OpenApiSecurityScheme
-    //                     {
-    //                         Reference = new OpenApiReference
-    //                         {
-    //                             Type = ReferenceType.SecurityScheme,
-    //                             Id = "Bearer"
-    //                         },
-    //                         Scheme = "Bearer",
-    //                         Name = "Bearer",
-    //                         In = ParameterLocation.Header,
-
-    //                     },
-    //                     new List<string>()
-    //                 }
-    //             });
+                        },
+                        new List<string>()
+                    }
+                });
 });
 
 

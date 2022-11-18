@@ -1,54 +1,96 @@
 
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using LinuxCourses.Data;
+using LinuxCourses.DTOs.Responses;
+using LinuxCourses.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 
+using static LinuxCourses.Features.Prelude;
 using static LinuxCourses.Features.Auth.Prelude;
+using Microsoft.AspNetCore.Server.IIS.Core;
+
 namespace LinuxCourses.Features.Auth.Login;
 
-public class LoginCommand
-{
-    public string? UserName { get; set; }
-    public string? Password { get; set; }
-}
-
-public class AuthenticatedResponse
-{
-    public string? Token { get; set; }
-}
 
 [Route($"{ApiPath}[controller]")]
 [ApiController]
 [AllowAnonymous]
 public class Login : ControllerBase
 {
-    const string ApiUrl = "https://localhost:7005";
+	private readonly IMediator _mediator;
 
-    [HttpPost("login")]
-    public IActionResult Post([FromBody] LoginCommand user)
-    {
-        if (user is null)
-        {
-            return BadRequest("Invalid client request");
-        }
-        // TODO ULTRA: Implement propper authentication.
-        if (user.UserName == "johndoe" && user.Password == "def@123")
-        {
-            var secretKey_ = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
-            var signinCredentials_ = new SigningCredentials(secretKey_, SecurityAlgorithms.HmacSha256);
-            var tokenOptions_ = new JwtSecurityToken(
-                issuer: ApiUrl,
-                audience: ApiUrl,
-                claims: new List<Claim>(),
-                expires: DateTime.Now.AddMinutes(5),
-                signingCredentials: signinCredentials_
-            );
-            var tokenString_ = new JwtSecurityTokenHandler().WriteToken(tokenOptions_);
-            return Ok(new AuthenticatedResponse { Token = tokenString_ });
-        }
-        return Unauthorized();
-    }
+	public Login(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
+
+	[HttpPost]
+	public async Task<IActionResult> RegisterNewUser([FromBody] LoginCommand comm)
+	{
+		return await _mediator.Send(comm);
+	}
+}
+public class LoginCommand : IRequest<ApiResponse>
+{
+    [MaxLength(64)]
+    public string? UserName { get; set; }
+    [MaxLength(256)]
+    public string? Password { get; set; }
+}
+
+public class LoginResponse : SuccessResponse
+{
+	public LoginResponse(string userName, string token)
+	{
+		UserName = userName;
+		Token = token;
+	}
+
+	public string UserName { get; set; }
+    public string Token { get; set; }
+
+}
+
+
+public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse>
+{
+    private readonly UserManager<User> _users;
+    private readonly ITokenService _tokens;
+
+	public LoginCommandHandler(UserManager<User> users, ITokenService tokens)
+	{
+		_users = users;
+		_tokens = tokens;
+	}
+
+	public async Task<ApiResponse> Handle(LoginCommand req, CancellationToken cancellationToken)
+	{
+        User user = await _users.FindByNameAsync(req.UserName);
+		if(user is null)
+			return AuthFail(Fail("There is no such user in database!"));
+
+		bool userHasValidPassword = await _users.CheckPasswordAsync(user, req.Password);
+		if(userHasValidPassword is false)
+			return AuthFail(Fail("Invalid password for this user!"));
+
+		var token = _tokens.IssueToken(user);
+		if(token is not TokenResult res)
+			return AuthFail((FailureResponse)token);
+
+		// TODO: Maybe use AutoMapper here, or completely use lang-ext.Result for error handling in such situations.
+		return new LoginResponse(
+				userName: res.UserName,
+				token: res.Token
+			);
+	}
 }

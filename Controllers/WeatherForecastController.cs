@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 using LinuxCourses.Data.Services;
 using LinuxCourses.Features.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -9,8 +11,8 @@ namespace LinuxCourses.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[AllowAnonymous]
-[NeedPerms]
+// [NeedPerms]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
