@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,7 +76,11 @@ bob.Services.AddAuthentication(opt => {
 
 bob.Services.AddMediatR(typeof(Program));
 
-bob.Services.AddTransient<ITokenService, TokenService>();
+// TODO: Move this declarations to separate function.
+// App services:
+{
+    bob.Services.AddTransient<ITokenService, TokenService>();
+}
 
 bob.Services.AddControllersWithViews();
 
@@ -155,6 +160,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
+}
+
+// TODO: Move it to separate function.
+// Ensure roles are created:
+{
+    using var scope = app.Services.CreateScope();
+    var roles = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
+    if(await roles.RoleExistsAsync(AppRole.Admin) is false)
+        await roles.CreateAsync(new AppRole() { Name = AppRole.Admin });
+    if(await roles.RoleExistsAsync(AppRole.CanCreateCourses) is false)
+        await roles.CreateAsync(new AppRole() { Name = AppRole.CanCreateCourses });
 }
 
 app.Run();

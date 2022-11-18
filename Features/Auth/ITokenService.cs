@@ -4,6 +4,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
+using AspNetCore.Identity.MongoDbCore.Extensions;
 using AspNetCore.Identity.MongoDbCore.Models;
 using LinuxCourses.DTOs.Responses;
 using LinuxCourses.Models;
@@ -27,7 +29,7 @@ public sealed class TokenResult : SuccessResponse
 
 public interface ITokenService
 {
-	ApiResponse IssueToken(User user);
+	Task<ApiResponse> IssueTokenAsync(User user);
 }
 
 public class TokenService : ITokenService
@@ -45,9 +47,10 @@ public class TokenService : ITokenService
 	/// 
 	/// </summary>
 	/// <returns>TokenResult|Fail</returns>
-	public ApiResponse IssueToken(User user)
+	public async Task<ApiResponse> IssueTokenAsync(User user)
 	{
 		byte[] key_ = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+		// user.Roles
 		SecurityTokenDescriptor tokenDesc_ = new() {
 			Subject= new ClaimsIdentity(new Claim[] {
 				new(JwtRegisteredClaimNames.Sub, user.UserName),
@@ -59,6 +62,13 @@ public class TokenService : ITokenService
 			Expires= DateTime.Now.AddHours(2),
 			SigningCredentials= new SigningCredentials(new SymmetricSecurityKey(key_), SecurityAlgorithms.HmacSha256Signature)
 		};
+		tokenDesc_.Claims = new Dictionary<string, object>(
+				(await _userManager.GetRolesAsync(user))
+				.Select(role => new KeyValuePair<string, object>(ClaimTypes.Role, role))
+			);
+		// foreach(string role in await _userManager.GetRolesAsync(user))
+		// 	tokenDesc_.Claims.Add(ClaimTypes.Role, role);
+
 		JwtSecurityTokenHandler tokenHandler = new();
 		SecurityToken token = tokenHandler.CreateToken(tokenDesc_);
 

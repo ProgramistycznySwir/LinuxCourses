@@ -7,7 +7,7 @@ namespace LinuxCourses.DTOs.Responses;
 
 public class AuthorizationFailureResponse : FailureResponse
 {
-	public const bool ObfuscateResponses = true;
+	public const bool ObfuscateResponses = false;
 	private static readonly string[] ObfuscatedErrors = new[] { "OBFUSCATED" };
 
 	public AuthorizationFailureResponse(IEnumerable<string> errors)

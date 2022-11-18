@@ -83,7 +83,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse>
 		if(userHasValidPassword is false)
 			return AuthFail(Fail("Invalid password for this user!"));
 
-		var token = _tokens.IssueToken(user);
+		var token = await _tokens.IssueTokenAsync(user);
 		if(token is not TokenResult res)
 			return AuthFail((FailureResponse)token);
 

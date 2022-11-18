@@ -91,7 +91,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
         if (result.Succeeded is false)
             return Fail(result);
 
-		var token = _tokens.IssueToken(newUser);
+		var token = await _tokens.IssueTokenAsync(newUser);
 		if(token is not TokenResult res)
 			return AuthFail((FailureResponse)token);
 

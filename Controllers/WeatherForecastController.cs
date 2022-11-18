@@ -12,7 +12,7 @@ namespace LinuxCourses.Controllers;
 [ApiController]
 [Route("[controller]")]
 // [NeedPerms]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
