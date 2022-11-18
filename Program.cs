@@ -1,18 +1,25 @@
 using System.Text;
+using LinuxCourses.Auth;
 using LinuxCourses.Data;
 using LinuxCourses.Data.Services;
+using LinuxCourses.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Events;
 using Serilog;
 
 const string ApiUrl = "https://localhost:7005";
+// TODO ULTRA: Replace this secret key with some propper value!
+const string JwtSecret = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 
 
@@ -31,13 +38,24 @@ bob.Services.AddScoped<IMongoDb, MongoDb>();
     bob.Services.AddTransient<IQuizRepository, QuizRepository>();
 }
 
+LinuxCoursesDatabaseSettings settings = new();
+bob.Configuration.Bind("Db_Main", settings);
+
+
+bob.Services.AddIdentity<User, AppRole>()
+        .AddMongoDbStores<User, AppRole, Guid> (
+            settings.ConnectionString,
+            settings.DatabaseName
+        );
+
 bob.Services.AddAuthentication(opt => {
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(options =>
+    .AddJwtBearer(opt =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        opt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -46,9 +64,11 @@ bob.Services.AddAuthentication(opt => {
             ValidIssuer = ApiUrl,
             ValidAudience = ApiUrl,
             // TODO ULTRA: Replace this secret key with some propper value!
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSecret))
         };
     });
+
+bob.Services.AddMediatR(typeof(Program));
 
 bob.Services.AddControllersWithViews();
 
@@ -63,7 +83,39 @@ bob.Host.UseSerilog((context, configuration) => {
     });
 
 bob.Services.AddEndpointsApiExplorer();
-bob.Services.AddSwaggerGen();
+bob.Services.AddSwaggerGen(x => {
+    // x.SwaggerDoc("v1", new OpenApiInfo { Title= "LinuxCourses API", Version= "v1" });
+
+    // // var security = new OpenApiSecurityRequirement(); new Dictionary<string, IEnumerable<string>> {
+    // //         { "Bearer", new string[0] }
+    // //     };
+    // x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
+    //     Description = "JWT",
+    //     Name = "Auth",
+    //     In = ParameterLocation.Header,
+    //     Type = SecuritySchemeType.ApiKey
+    // });
+    // // x.AddSecurityRequirement(security);
+
+    // x.AddSecurityRequirement(new OpenApiSecurityRequirement
+    //             {
+    //                 {
+    //                     new OpenApiSecurityScheme
+    //                     {
+    //                         Reference = new OpenApiReference
+    //                         {
+    //                             Type = ReferenceType.SecurityScheme,
+    //                             Id = "Bearer"
+    //                         },
+    //                         Scheme = "Bearer",
+    //                         Name = "Bearer",
+    //                         In = ParameterLocation.Header,
+
+    //                     },
+    //                     new List<string>()
+    //                 }
+    //             });
+});
 
 
 
@@ -84,6 +136,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseCourseAccessAuthorization();
 
 app.MapControllerRoute(
         name: "default",
@@ -99,6 +152,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.Run();

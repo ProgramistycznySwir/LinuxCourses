@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using LinuxCourses.Data.Services;
+using LinuxCourses.Features.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -8,6 +9,8 @@ namespace LinuxCourses.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[AllowAnonymous]
+[NeedPerms]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]

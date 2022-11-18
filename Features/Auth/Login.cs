@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LinuxCourses.Features.Login;
+using static LinuxCourses.Features.Auth.Prelude;
+namespace LinuxCourses.Features.Auth.Login;
 
-public class LoginModel
+public class LoginCommand
 {
     public string? UserName { get; set; }
     public string? Password { get; set; }
@@ -19,15 +20,15 @@ public class AuthenticatedResponse
     public string? Token { get; set; }
 }
 
-[Route("api/[controller]")]
+[Route($"{ApiPath}[controller]")]
 [ApiController]
 [AllowAnonymous]
-public class AuthController : ControllerBase
+public class Login : ControllerBase
 {
     const string ApiUrl = "https://localhost:7005";
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginModel user)
+    public IActionResult Post([FromBody] LoginCommand user)
     {
         if (user is null)
         {
