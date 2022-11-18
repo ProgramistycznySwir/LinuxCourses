@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LinuxCourses.Data;
 using LinuxCourses.DTOs.Responses;
+using LinuxCourses.Filters;
 using LinuxCourses.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,11 +36,23 @@ public class NewCourseResponse : SuccessResponse
 [Route("api/courses/[controller]")]
 [ApiController]
 [Authorize(Roles = AppRole.CanCreateCourses_AndAbove, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Validate]
 public class CreateCourse : ControllerBase
 {
-	[HttpPost]
-	public async Task<IActionResult> Post(Guid id)
+	private readonly IMongoCollection<Course> _courses;
+
+	public CreateCourse(IMongoDb mongo)
 	{
+		this._courses = mongo.Courses();
+	}
+
+	[HttpPost]
+	public async Task<IActionResult> Post([FromBody]CreateCourseCommand comm)
+	{
+		_courses.InsertOne(new Course {
+			Name= comm.Name,
+			Description= comm.Description
+		});
 		return Ok();
 		throw TODO;
 	}
