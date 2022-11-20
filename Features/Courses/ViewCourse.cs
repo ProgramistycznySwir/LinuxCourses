@@ -25,7 +25,7 @@ public class ViewCourse : ControllerBase
 	public async Task<NewUserResponse> Get(Guid id)
 	{
 
-		throw TODO;
+		throw TODO;	
 	}
 		// => await _mediator.Send(new GetCourseQuery(comm));
 }

@@ -49,12 +49,20 @@ public class CreateCourse : ControllerBase
 	[HttpPost]
 	public async Task<IActionResult> Post([FromBody]CreateCourseCommand comm)
 	{
-		_courses.InsertOne(new Course {
+		Guid userId = new Guid(HttpContext.GetUserId());
+		Course newCourse = new() {
+			Id= Guid.NewGuid(),
 			Name= comm.Name,
-			Description= comm.Description
-		});
-		return Ok();
-		throw TODO;
+			Description= comm.Description,
+			Groups= {new () {
+				Name= "Admin",
+				Users= {
+					new (){ User_Id= userId, Perms= CoursePerms_.Roles.Admin }
+				}
+			}}
+		};
+		_courses.InsertOne(newCourse);
+		return Ok(newCourse);
 	}
 		// => await _mediator.Send(new GetCourseQuery(comm));
 }

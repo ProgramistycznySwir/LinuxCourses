@@ -58,7 +58,6 @@ public class LoginResponse : SuccessResponse
 
 	public string UserName { get; set; }
     public string Token { get; set; }
-
 }
 
 
