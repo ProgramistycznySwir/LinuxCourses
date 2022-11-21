@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 using LinuxCourses.Auth;
 using LinuxCourses.Data;
@@ -8,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +28,21 @@ const string JwtSecret = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 
 var bob = WebApplication.CreateBuilder(args);
+// bob.Host.ConfigureWebHost(host => {
+//     host.ConfigureKestrel(options =>
+// {
+//     options.ConfigureHttpsDefaults(httpsOptions =>
+//     {
+//         var certPath = Path.Combine(bob.Environment.ContentRootPath, "cert.pem");
+//         var keyPath = Path.Combine(bob.Environment.ContentRootPath, "key.pem");
+
+//         httpsOptions.ServerCertificate = X509Certificate2.CreateFromPemFile(certPath, 
+//                                          keyPath);
+//     });
+// });
+// }
+// )
+// bob.Host.UseKestrel();
 
 // Add services to the container.
 // Database:
