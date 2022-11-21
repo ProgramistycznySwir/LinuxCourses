@@ -17,7 +17,11 @@ export class AuthComponent implements OnInit {
     password: new FormControl(null, [ Validators.required ]),
   })
 
-  constructor(private router: Router, private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
+  constructor(
+      private _router: Router,
+      private _http: HttpClient,
+      @Inject('API_URL') private API_URL: string,
+    ) { }
 
   ngOnInit(): void {
   }
@@ -25,22 +29,5 @@ export class AuthComponent implements OnInit {
   login() {
     if(this.loginForm.invalid)
       return;
-    
-    const creadentials = {
-      'username': this.loginForm.value.username,
-      'password': this.loginForm.value.password
-    }
-
-    this.http.post(`${this.baseUrl}api/courses/CreateCourse`, creadentials)
-      .pipe(tap(console.log))
-      .subscribe({next: res  => {
-        const token = (<any>res).token
-        localStorage.setItem("jwt", token)
-        this.invalidLogin = false
-        this.router.navigate(['/'])
-      }, error: err => {
-        this.invalidLogin = true
-        
-      }})
   }
 }

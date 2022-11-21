@@ -12,6 +12,8 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { AuthComponent } from './auth/auth.component';
+import { ApiService } from 'src/services/api.service';
+import { AccountComponent } from './nav-menu/account/account.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,8 @@ import { AuthComponent } from './auth/auth.component';
     HomeComponent,
     CounterComponent,
     FetchDataComponent,
-    AuthComponent
+    AuthComponent,
+    AccountComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -36,7 +39,9 @@ import { AuthComponent } from './auth/auth.component';
       { path: 'fetch-data', component: FetchDataComponent },
     ]),
   ],
-  providers: [],
+  providers: [
+    ApiService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

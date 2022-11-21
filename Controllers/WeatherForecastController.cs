@@ -10,7 +10,7 @@ using Serilog;
 namespace LinuxCourses.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 // [NeedPerms]
 // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class WeatherForecastController : ControllerBase
