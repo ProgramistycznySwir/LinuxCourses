@@ -980,4 +980,14 @@ module.exports = {
     "disabled",
   ],
   plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      "emerald",
+      {
+        mytheme: {
+          error: "#FF0000",
+        },
+      },
+    ],
+  },
 };

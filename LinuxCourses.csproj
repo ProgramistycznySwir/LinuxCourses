@@ -7,7 +7,7 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\linux-courses\</SpaRoot>
     <SpaProxyServerUrl>https://localhost:8085</SpaProxyServerUrl>
-    <SpaProxyLaunchCommand>vue serve</SpaProxyLaunchCommand>
+    <!-- <SpaProxyLaunchCommand>vue serve</SpaProxyLaunchCommand> -->
     <!-- <ImplicitUsings>enable</ImplicitUsings> -->
   </PropertyGroup>
 

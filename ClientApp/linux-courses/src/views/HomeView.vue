@@ -3,7 +3,6 @@
     <img alt="Vue logo" src="../assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
   </div>
-  <div></div>
 </template>
 
 <script lang="ts">
@@ -22,11 +21,11 @@ export default defineComponent({
     };
   },
   mounted() {
-    axios.get<string>("https://localhost:8085/api/WeatherForecast/")
-      .subscribe({
-        next: (res) => console.log(res),
-        error: (err) => console.error(err),
-      });
+    axios.get<string>(`${process.env.BASE_URL}api/WeatherForecast/`).subscribe({
+      next: (res) => console.log(res),
+      error: (err) => console.error(err),
+    });
+    var connection = new WebSocket("ws://localhost:8086/", "echo-protocol");
   },
 });
 </script>

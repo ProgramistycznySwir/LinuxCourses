@@ -28,21 +28,6 @@ const string JwtSecret = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 
 var bob = WebApplication.CreateBuilder(args);
-// bob.Host.ConfigureWebHost(host => {
-//     host.ConfigureKestrel(options =>
-// {
-//     options.ConfigureHttpsDefaults(httpsOptions =>
-//     {
-//         var certPath = Path.Combine(bob.Environment.ContentRootPath, "cert.pem");
-//         var keyPath = Path.Combine(bob.Environment.ContentRootPath, "key.pem");
-
-//         httpsOptions.ServerCertificate = X509Certificate2.CreateFromPemFile(certPath, 
-//                                          keyPath);
-//     });
-// });
-// }
-// )
-// bob.Host.UseKestrel();
 
 // Add services to the container.
 // Database:
