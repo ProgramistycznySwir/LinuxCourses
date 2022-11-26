@@ -25,7 +25,6 @@ export default defineComponent({
       next: (res) => console.log(res),
       error: (err) => console.error(err),
     });
-    var connection = new WebSocket("ws://localhost:8086/", "echo-protocol");
   },
 });
 </script>

@@ -1,8 +1,8 @@
 <template>
-  <div class="grid h-[calc(100vh-90px)] place-items-center">
-    <div class="card w-96 bg-base-100 shadow-xl">
+  <div class="grid h-[calc(100vh-120px)] place-items-center">
+    <div class="card w-96 bg-base-200 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title self-center">Login</h2>
+        <h2 class="card-title self-center">Zaloguj</h2>
         <Form @submit="handleLogin" :validation-schema="schema">
           <div class="form-control w-full max-w-xs">
             <Field
@@ -28,7 +28,7 @@
                 v-show="loading"
                 class="spinner-border spinner-border-sm"
               ></span>
-              <span>Login</span>
+              <span>Zaloguj się</span>
             </button>
           </div>
           <div class="form-group">
@@ -46,6 +46,7 @@
 import { defineComponent } from "vue";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
+import { from } from "rxjs/internal/observable/from";
 export default defineComponent({
   name: "LoginView",
   components: {
@@ -72,27 +73,23 @@ export default defineComponent({
   },
   created() {
     if (this.loggedIn) {
-      this.$router.push("/profile");
+      this.$router.back();
     }
   },
   methods: {
     handleLogin(user: any): void {
       this.loading = true;
 
-      this.$store.dispatch("auth/login", user).then(
-        () => {
-          this.$router.push("/profile");
-        },
-        (error: any) => {
+      from(this.$store.dispatch("auth/login", user)).subscribe({
+        next: (res) => this.$router.back(),
+        error: (err) => {
           this.loading = false;
           this.message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
-        }
-      );
+            (err.response && err.response.data && err.response.data.message) ||
+            err.message ||
+            err.toString();
+        },
+      });
     },
   },
 });

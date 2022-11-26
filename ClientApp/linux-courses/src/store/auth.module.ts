@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import AuthResponse from "@/models/AuthResponse";
+import Register_Request from "@/models/Register_Request";
+import UserLogin_Request from "@/models/UserLogin_Request";
 import AuthService from "../services/auth.service";
 
 export default interface AuthState {
@@ -17,7 +19,7 @@ export const auth = {
   state: initialState,
   actions: {
     // @ts-ignore
-    login({ commit }, user: { username: string; password: string }) {
+    login({ commit }, user: UserLogin_Request) {
       const result = AuthService.login(user);
       result.subscribe({
         next: (res) => {
@@ -37,7 +39,7 @@ export const auth = {
     register(
       // @ts-ignore
       { commit },
-      user: { username: string; email: string; password: string }
+      user: Register_Request
     ) {
       const result = AuthService.register(user);
       result.subscribe({

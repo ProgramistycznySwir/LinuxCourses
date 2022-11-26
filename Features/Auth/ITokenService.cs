@@ -62,10 +62,9 @@ public class TokenService : ITokenService
 			Expires= DateTime.Now.AddHours(2),
 			SigningCredentials= new SigningCredentials(new SymmetricSecurityKey(key_), SecurityAlgorithms.HmacSha256Signature)
 		};
-		tokenDesc_.Claims = new Dictionary<string, object>(
-				(await _userManager.GetRolesAsync(user))
-				.Select(role => new KeyValuePair<string, object>(ClaimTypes.Role, role))
-			);
+		tokenDesc_.Claims = new Dictionary<string, object>{
+			{ ClaimTypes.Role, await _userManager.GetRolesAsync(user) }
+		};
 		// foreach(string role in await _userManager.GetRolesAsync(user))
 		// 	tokenDesc_.Claims.Add(ClaimTypes.Role, role);
 

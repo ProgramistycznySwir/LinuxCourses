@@ -13,7 +13,9 @@ module.exports = defineConfig({
     https: true,
     hot: false,
   },
+
   transpileDependencies: true,
+  lintOnSave: false,
 });
 
 // module.exports += {

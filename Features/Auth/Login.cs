@@ -50,13 +50,15 @@ public class LoginCommand : IRequest<ApiResponse>
 
 public class LoginResponse : SuccessResponse
 {
-	public LoginResponse(string userName, string token)
+	public LoginResponse(string userName, List<string> roles, string token)
 	{
 		UserName = userName;
+		Roles = roles;
 		Token = token;
 	}
 
 	public string UserName { get; set; }
+	public List<string> Roles { get; set; }
     public string Token { get; set; }
 }
 
@@ -86,9 +88,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse>
 		if(token is not TokenResult res)
 			return AuthFail((FailureResponse)token);
 
+		// var roles = await _users
+
 		// TODO: Maybe use AutoMapper here, or completely use lang-ext.Result for error handling in such situations.
 		return new LoginResponse(
 				userName: res.UserName,
+				roles: null!,
 				token: res.Token
 			);
 	}

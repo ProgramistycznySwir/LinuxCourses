@@ -7,7 +7,7 @@ import { Observable, tap } from "rxjs";
 
 const API_URL = `${process.env.BASE_URL}api/Auth/`;
 
-class AuthService {
+class RolesService {
   login(
     user: UserLogin_Request
   ): AxiosObservable<AuthResponse | FailedAuthResponse> {
@@ -28,14 +28,6 @@ class AuthService {
     });
     return result;
   }
-
-  logout() {
-    localStorage.removeItem("user");
-  }
-
-  register(user: Register_Request) {
-    return axios.post(`${API_URL}Register`, user);
-  }
 }
 
-export default new AuthService();
+export default new RolesService();

@@ -102,7 +102,7 @@ bob.Services.AddSwaggerGen(x => {
 
     x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme{
         Description = "JWT",
-        Name = "Auth",
+        Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey
     });
