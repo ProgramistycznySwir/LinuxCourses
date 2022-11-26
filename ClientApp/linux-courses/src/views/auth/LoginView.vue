@@ -73,7 +73,7 @@ export default defineComponent({
   },
   created() {
     if (this.loggedIn) {
-      this.$router.back();
+      this.$router.push("/");
     }
   },
   methods: {
@@ -81,7 +81,7 @@ export default defineComponent({
       this.loading = true;
 
       from(this.$store.dispatch("auth/login", user)).subscribe({
-        next: (res) => this.$router.back(),
+        next: (res) => this.$router.push("/"),
         error: (err) => {
           this.loading = false;
           this.message =

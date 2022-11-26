@@ -20,16 +20,16 @@ export const auth = {
   actions: {
     // @ts-ignore
     login({ commit }, user: UserLogin_Request) {
-      const result = AuthService.login(user);
-      result.subscribe({
+      AuthService.login(user).subscribe({
         next: (res) => {
-          commit("loginSuccess", user);
+          console.warn("Login success", res.data);
+          commit("loginSuccess", res.data);
         },
         error: (err) => {
+          console.warn("Login error", err);
           commit("loginFailure");
         },
       });
-      return result;
     },
     // @ts-ignore
     logout({ commit }) {
@@ -54,22 +54,23 @@ export const auth = {
     },
   },
   mutations: {
-    loginSuccess(state: any, user: AuthResponse) {
+    loginSuccess(state: AuthState, user: AuthResponse) {
       state.status.loggedIn = true;
       state.user = user;
+      console.warn(state);
     },
-    loginFailure(state: any) {
+    loginFailure(state: AuthState) {
       state.status.loggedIn = false;
       state.user = null;
     },
-    logout(state: any) {
+    logout(state: AuthState) {
       state.status.loggedIn = false;
       state.user = null;
     },
-    registerSuccess(state: any) {
+    registerSuccess(state: AuthState) {
       state.status.loggedIn = false;
     },
-    registerFailure(state: any) {
+    registerFailure(state: AuthState) {
       state.status.loggedIn = false;
     },
   },

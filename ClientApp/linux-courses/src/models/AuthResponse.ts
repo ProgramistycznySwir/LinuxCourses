@@ -1,5 +1,6 @@
+import jwtDecode, { JwtPayload } from "jwt-decode";
+
 export default interface AuthResponse {
-  username: string;
-  roles: string[];
+  userName: string;
   token: string;
 }

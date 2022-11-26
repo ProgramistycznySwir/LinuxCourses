@@ -9,8 +9,8 @@
           About
         </router-link>
       </div>
-      <div v-if="currentUser" class="bold-case text-xl">
-        {{ currentUser?.username }}
+      <div v-if="loggedIn" class="bold-case text-xl">
+        {{ currentUser?.userName }}
         <button
           class="btn btn-ghost normal-case text-xl"
           @click.prevent="logout"
@@ -40,6 +40,9 @@ import { defineComponent } from "vue";
 export default defineComponent({
   name: "App",
   computed: {
+    loggedIn() {
+      return this.$store.state.auth.status.loggedIn;
+    },
     currentUser() {
       return this.$store.state.auth.user;
     },

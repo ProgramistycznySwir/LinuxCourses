@@ -3,7 +3,7 @@ import FailedAuthResponse from "@/models/FailedAuthResponse";
 import Register_Request from "@/models/Register_Request";
 import UserLogin_Request from "@/models/UserLogin_Request";
 import axios, { AxiosObservable } from "axios-observable";
-import { Observable, tap } from "rxjs";
+import { tap } from "rxjs";
 
 const API_URL = `${process.env.BASE_URL}api/Auth/`;
 
@@ -11,22 +11,21 @@ class AuthService {
   login(
     user: UserLogin_Request
   ): AxiosObservable<AuthResponse | FailedAuthResponse> {
-    const result = axios
+    return axios
       .post<AuthResponse | FailedAuthResponse>(`${API_URL}Login`, user)
-      .pipe(tap(console.info));
-    result.subscribe({
-      next: (res) => {
-        const authRes = res.data as AuthResponse;
-        if (authRes)
-          localStorage.setItem("user", JSON.stringify(authRes.token));
-
-        return res.data;
-      },
-      error: (err) => {
-        alert("Nie udało się zalogować");
-      },
-    });
-    return result;
+      .pipe(
+        tap(console.info),
+        tap({
+          next: (res) => {
+            const authRes = res.data as AuthResponse;
+            console.log(authRes);
+            if (authRes) localStorage.setItem("user", JSON.stringify(authRes));
+          },
+          error: (err) => {
+            alert("Nie udało się zalogować");
+          },
+        })
+      );
   }
 
   logout() {
@@ -34,7 +33,9 @@ class AuthService {
   }
 
   register(user: Register_Request) {
-    return axios.post(`${API_URL}Register`, user);
+    return axios
+      .post(`${API_URL}Register`, user)
+      .pipe(tap((res) => console.log("Registers", res)));
   }
 }
 
