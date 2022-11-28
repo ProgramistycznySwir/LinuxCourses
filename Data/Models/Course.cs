@@ -10,9 +10,9 @@ public class Course : IHasId<Guid>
 	public string Name { get; set; }
 	public string Description { get; set; }
 
-	public Guid? CategoryId { get; set; }
+	public Guid CategoryId { get; set; }
 
-	public ICollection<Guid> Quizes_Ids { get; set; }
+	public List<Guid> Quizes_Ids { get; set; }
 
-	public ICollection<UserGroup> Groups { get; set; }
+	public List<UserGroup> Groups { get; set; }
 }

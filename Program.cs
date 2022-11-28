@@ -34,6 +34,13 @@ var bob = WebApplication.CreateBuilder(args);
 bob.Services.Configure<LinuxCoursesDatabaseSettings>(
         bob.Configuration.GetSection("Db_Main")
     );
+MongoDB.Bson.Serialization.Conventions.ConventionRegistry.Register(
+    "Ignore null values",
+    new MongoDB.Bson.Serialization.Conventions.ConventionPack
+	{
+        new MongoDB.Bson.Serialization.Conventions.IgnoreIfNullConvention(true)
+    },
+    t => true);
 MongoDB.Bson.BsonDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
 bob.Services.AddScoped<IMongoDb, MongoDb>();
 
@@ -83,6 +90,7 @@ bob.Services.AddMediatR(typeof(Program));
 {
     bob.Services.AddTransient<ITokenService, TokenService>();
 
+    bob.Services.AddTransient<ICourseRepository, CourseRepository>();
     bob.Services.AddTransient<ICourseCategoryReporitory, CourseCategoryReporitory>();
 }
 

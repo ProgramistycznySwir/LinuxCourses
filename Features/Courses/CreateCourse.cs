@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LinuxCourses.Data;
+using LinuxCourses.Data.Services;
 using LinuxCourses.DTOs.Responses;
 using LinuxCourses.Filters;
 using LinuxCourses.Models;
@@ -39,11 +41,11 @@ public class NewCourseResponse : SuccessResponse
 [Validate]
 public class CreateCourse : ControllerBase
 {
-	private readonly IMongoCollection<Course> _courses;
+	private readonly ICourseRepository _courses;
 
-	public CreateCourse(IMongoDb mongo)
+	public CreateCourse(ICourseRepository courses)
 	{
-		this._courses = mongo.Courses();
+		_courses = courses;
 	}
 
 	[HttpPost]
@@ -51,18 +53,20 @@ public class CreateCourse : ControllerBase
 	{
 		Guid userId = new Guid(HttpContext.GetUserId());
 		Course newCourse = new() {
-			Id= Guid.NewGuid(),
 			Name= comm.Name,
 			Description= comm.Description,
-			Groups= {new () {
+			Groups= new (){new () {
 				Name= "Admin",
-				Users= {
+				Users= new (){
 					new (){ User_Id= userId, Perms= CoursePerms_.Roles.Admin }
 				}
 			}}
 		};
-		_courses.InsertOne(newCourse);
-		return Ok(newCourse);
+		await _courses.Create(newCourse);
+
+		return Ok();
+		// _courses.InsertOne(newCourse);
+		// return Ok(newCourse);
 	}
 		// => await _mediator.Send(new GetCourseQuery(comm));
 }

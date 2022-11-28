@@ -7,5 +7,5 @@ namespace LinuxCourses.Models;
 public class UserGroup
 {
 	public string Name { get; set; }
-	public ICollection<UserPerms> Users { get; set; }
+	public List<UserPerms> Users { get; set; }
 }

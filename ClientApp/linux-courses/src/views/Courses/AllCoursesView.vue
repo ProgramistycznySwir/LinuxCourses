@@ -4,7 +4,10 @@
   </div> -->
   <div class="mx-40">
     <div class="w-full bg-primary">
-      RED
+      <div>
+        <router-link to=""> Bez kategorii. </router-link>
+        <div>Ilość kursów: {{}}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -13,18 +16,29 @@
 import { defineComponent } from "vue";
 import axios from "axios-observable";
 
+interface CourseCategory {
+  Id: string;
+  name: string;
+  subCategories: CourseCategory[];
+  CourseCount: number;
+}
+
 export default defineComponent({
   name: "AllCoursesView",
   data() {
     return {
-      forecasts: null,
+      courseCategories: [] as CourseCategory[],
     };
   },
   mounted() {
-    axios.get<string>(`${process.env.BASE_URL}api/WeatherForecast/`).subscribe({
-      next: (res) => console.log(res),
-      error: (err) => console.error(err),
-    });
+    axios
+      .get<CourseCategory[]>(
+        `${process.env.BASE_URL}api/categories/GetCoursesTree`
+      )
+      .subscribe({
+        next: (res) => (this.$data.courseCategories = res.data),
+        error: (err) => console.error(err),
+      });
   },
 });
 </script>

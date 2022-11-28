@@ -1,0 +1,65 @@
+{
+	"t": {
+		"$date": "2022-11-28T02:09:22.610+00:00"
+	},
+	"s": "W",
+	"c": "COMMAND",
+	"id": 23802,
+	"ctx": "conn153",
+	"msg": "Plan executor error during findAndModify",
+	"attr": {
+		"error": {
+			"code": 2,
+			"codeName": "BadValue",
+			"errmsg": "The field 'Courses' must be an array but is of type null in document {_id: UUID(\"1563f4ab-91ba-4d91-a5df-76901f346d65\")}"
+		},
+		"stats": {
+			"stage": "UPDATE",
+			"nReturned": 0,
+			"executionTimeMillisEstimate": 7,
+			"works": 2,
+			"advanced": 0,
+			"needTime": 1,
+			"needYield": 0,
+			"saveState": 0,
+			"restoreState": 0,
+			"failed": true,
+			"isEOF": 0,
+			"nMatched": 0,
+			"nWouldModify": 0,
+			"nWouldUpsert": 0,
+			"inputStage": {
+				"stage": "COLLSCAN",
+				"filter": {
+					"Name": {
+						"$eq": "BRAK"
+					}
+				},
+				"nReturned": 1,
+				"executionTimeMillisEstimate": 0,
+				"works": 2,
+				"advanced": 1,
+				"needTime": 1,
+				"needYield": 0,
+				"saveState": 1,
+				"restoreState": 0,
+				"isEOF": 0,
+				"direction": "forward",
+				"docsExamined": 1
+			}
+		},
+		"cmd": {
+			"findAndModify": "CourseCategories",
+			"query": {
+				"Name": "BRAK"
+			},
+			"update": {
+				"$push": {
+					"Courses": {
+						"$uuid": "87f16156-84b7-460a-a358-ad4f3b58e219"
+					}
+				}
+			}
+		}
+	}
+}

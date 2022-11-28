@@ -9,6 +9,8 @@ namespace LinuxCourses.Data;
 
 public interface IMongoDb
 {
+	IMongoDatabase GetMongoDatabase();
+
 	IMongoCollection<Quiz> Quizes();
 	IMongoCollection<Course> Courses();
 	IMongoCollection<CourseCategory> Categories();
@@ -30,6 +32,9 @@ public class MongoDb : IMongoDb
 		var mongoClient_ = new MongoClient(_settings.ConnectionString);
 		_mongo = mongoClient_.GetDatabase(_settings.DatabaseName);
 	}
+
+	public IMongoDatabase GetMongoDatabase()
+		=> _mongo;
 
 	public IMongoCollection<Quiz> Quizes()
 		=> _mongo.GetCollection<Quiz>(_settings.Quizes);

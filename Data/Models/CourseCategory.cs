@@ -15,6 +15,6 @@ public class CourseCategory : IHasId<Guid>
 	// INFO: Self is organized in tree-structure.
 	public Guid? Parent { get; set; }
 	// TODO: Create index for this!
-	public ICollection<Guid> SubCategories { get; set; }
-	public ICollection<Guid> Courses { get; set; }
+	public List<Guid> SubCategories { get; set; }
+	public List<Guid> Courses { get; set; }
 }
