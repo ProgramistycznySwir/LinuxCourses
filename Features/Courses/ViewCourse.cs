@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 
+using static LinuxCourses.Prelude;
 using static LinuxCourses.Features.Prelude;
 namespace LinuxCourses.Features.Courses.ViewCourse;
 

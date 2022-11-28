@@ -9,4 +9,5 @@ public class LinuxCoursesDatabaseSettings
     public string Courses { get; set; } = null!;
     public string Users { get; set; } = null!;
     public string AuthData { get; set; } = null!;
+    public string CourseCategories { get; set; } = null!;
 }

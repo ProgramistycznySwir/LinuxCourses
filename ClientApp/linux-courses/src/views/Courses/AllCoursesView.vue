@@ -2,8 +2,10 @@
   <!-- <div v-if="">
 
   </div> -->
-  <div>
-    
+  <div class="mx-40">
+    <div class="w-full bg-primary">
+      RED
+    </div>
   </div>
 </template>
 
@@ -12,7 +14,7 @@ import { defineComponent } from "vue";
 import axios from "axios-observable";
 
 export default defineComponent({
-  name: "MyCoursesView",
+  name: "AllCoursesView",
   data() {
     return {
       forecasts: null,

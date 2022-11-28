@@ -82,6 +82,8 @@ bob.Services.AddMediatR(typeof(Program));
 // App services:
 {
     bob.Services.AddTransient<ITokenService, TokenService>();
+
+    bob.Services.AddTransient<ICourseCategoryReporitory, CourseCategoryReporitory>();
 }
 
 bob.Services.AddControllersWithViews();

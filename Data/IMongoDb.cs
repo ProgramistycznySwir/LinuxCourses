@@ -11,6 +11,7 @@ public interface IMongoDb
 {
 	IMongoCollection<Quiz> Quizes();
 	IMongoCollection<Course> Courses();
+	IMongoCollection<CourseCategory> Categories();
 	IMongoCollection<User> Users();
 	IMongoCollection<AuthData> AuthData();
 }
@@ -41,4 +42,7 @@ public class MongoDb : IMongoDb
 
 	public IMongoCollection<AuthData> AuthData()
 		=> _mongo.GetCollection<AuthData>(_settings.AuthData);
+
+	public IMongoCollection<CourseCategory> Categories()
+		=> _mongo.GetCollection<CourseCategory>(_settings.CourseCategories);
 }

@@ -57,7 +57,6 @@ export const auth = {
     loginSuccess(state: AuthState, user: AuthResponse) {
       state.status.loggedIn = true;
       state.user = user;
-      console.warn(state);
     },
     loginFailure(state: AuthState) {
       state.status.loggedIn = false;
