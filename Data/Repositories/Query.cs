@@ -11,6 +11,7 @@ namespace LinuxCourses.Data.Services;
 public record struct MongoQuery<T>(FilterDefinition<T> Filter)
 {
 	public UpdateDefinition<T>? Update { get; set; } = null;
+	public ProjectionDefinition<T>? Projection { get; set; } = null;
 
 	public MongoQuery<T> WithUpdate(Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>> builder)
 	{
@@ -18,10 +19,28 @@ public record struct MongoQuery<T>(FilterDefinition<T> Filter)
 		return this;
 	}
 
+	/// <summary> Beware, it overrides the projection. </summary>
+	public MongoQuery<T> WithProjection(Func<ProjectionDefinitionBuilder<T>, ProjectionDefinition<T>> builder)
+	{
+		Projection= builder(Builders<T>.Projection);
+		return this;
+	}
+	// TODO LOW: I dislike like this type-erasure.
+	public MongoQuery<T> Include(Expression<Func<T, object>> field)
+	{
+		if(Projection is null)
+			Projection = Builders<T>.Projection.Include(field);
+		else
+			Projection.Include(field);
+		return this;
+	}
+
 	public static implicit operator FilterDefinition<T>(MongoQuery<T> self)
 		=> self.Filter;
 	public static implicit operator UpdateDefinition<T>(MongoQuery<T> self)
 		=> self.Update;
+	public static implicit operator ProjectionDefinition<T>(MongoQuery<T> self)
+		=> self.Projection;
 }
 
 public static class Query<T> where T : IHasId<Guid>

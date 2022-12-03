@@ -1,7 +1,10 @@
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using LinuxCourses.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
@@ -35,8 +38,7 @@ public class CourseRepository : ICourseRepository
 		var query = Query<CourseCategory>
 			.WithEq(e => e.Name, "BRAK")
 			.WithUpdate(b => b.Push(e => e.Courses, course.Id ));
-		var filter = query.Filter;
-		var updatedCategory = await _categories.FindOneAndUpdateAsync(filter, query);
+		var updatedCategory = await _categories.FindOneAndUpdateAsync(query, query);
 		course.CategoryId = updatedCategory.Id;
 		await _courses.InsertOneAsync(course);
 	}
@@ -46,9 +48,15 @@ public class CourseRepository : ICourseRepository
 		throw new NotImplementedException();
 	}
 
-	public Task<List<Course>> GetAllIn(Guid categoryId)
+	public async Task<List<Course>> GetAllIn(Guid categoryId)
 	{
-		throw new NotImplementedException();
+		var query = Query<Course>
+			.WithEq(e => e.CategoryId, categoryId)
+			.Include(e => e.Name);
+		var query_ = Builders<Course>.Projection.Include(e => e.Name);
+		return (await _courses.Find(query).Project(query_).ToListAsync())
+				.Select(e => BsonSerializer.Deserialize<Course>(e))
+				.ToList();
 	}
 
 	public Task Remove(Guid id)

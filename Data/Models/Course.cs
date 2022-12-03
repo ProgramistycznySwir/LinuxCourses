@@ -12,7 +12,7 @@ public class Course : IHasId<Guid>
 
 	public Guid CategoryId { get; set; }
 
-	public List<Guid> Quizes_Ids { get; set; }
+	public List<Guid> Quizes_Ids { get; set; } = new();
 
-	public List<UserGroup> Groups { get; set; }
+	public List<UserGroup> Groups { get; set; } = new();
 }

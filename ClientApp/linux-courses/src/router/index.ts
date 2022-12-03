@@ -21,8 +21,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/auth/LoginView.vue"),
   },
   {
+    path: "/categories/:id",
+    component: () => import("../views/Courses/CategoryView.vue"),
+  },
+  {
     path: "/categories",
-    component: () => import("../views/Courses/AllCoursesView.vue"),
+    component: () => import("../views/Courses/AllCategoriesView.vue"),
   },
   // {
   //   path: "/courses/:categoryId",

@@ -17,7 +17,7 @@ using static LinuxCourses.Features.CourseCategories.Prelude;
 using MongoDB.Bson;
 using LinuxCourses.Data.Services;
 
-namespace LinuxCourses.Features.Courses.ViewCourse;
+namespace LinuxCourses.Features.Courses.CourseCategories;
 
 
 [Route($"{ApiPath}[controller]")]
@@ -55,7 +55,7 @@ public class GetCoursesTree : ControllerBase
 		}
 
 		return new(
-				Id: category.Id,
+				Id: category.Id.ToSlug(),
 				Name: category.Name,
 				SubCategories: subCategories,
 				CourseCount: category.Courses.Count
@@ -68,4 +68,4 @@ public record GetCoursesTreeResponse(IEnumerable<StrippedDownCategory> RootCateg
 /// <summary>
 /// Contains only essential data.
 /// </summary>
-public record StrippedDownCategory(Guid Id, string Name, IEnumerable<StrippedDownCategory> SubCategories, int CourseCount);
+public record StrippedDownCategory(string Id, string Name, IEnumerable<StrippedDownCategory> SubCategories, int CourseCount);

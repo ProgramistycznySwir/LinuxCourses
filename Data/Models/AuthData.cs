@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace LinuxCourses.Models;
 
+[Obsolete("Deprecated in favour of using User which inherits mongo identity")]
 /// <summary>
 /// [Owned] by User (but stored separately).<br/>
 /// All the data that should under no circumstance leave API.

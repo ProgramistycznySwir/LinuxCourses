@@ -36,4 +36,9 @@ public class DEBUG : ControllerBase
     {
 		await SeedDb.Seed(_settings, true);
     }
+	[HttpGet("ToSlug/{guid}")]
+    public async Task<IActionResult> SeedDatabase(Guid guid)
+    {
+		return Ok(guid.ToSlug());
+    }
 }

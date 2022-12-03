@@ -9,7 +9,7 @@
 import { defineComponent } from "vue";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import axios from "axios-observable";
-import AllCoursesView from "./Courses/AllCoursesView.vue";
+import AllCoursesView from "./Courses/AllCategoriesView.vue";
 
 export default defineComponent({
   name: "HomeView",

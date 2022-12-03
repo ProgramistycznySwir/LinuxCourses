@@ -9,7 +9,11 @@
           About
         </router-link>
       </div>
-      <div v-if="loggedIn" class="bold-case text-xl">
+
+      <div
+        v-if="loggedIn"
+        class="bold-case text-xl bg-secondary rounded-lg px-5"
+      >
         {{ currentUser?.userName }}
         <button
           class="btn btn-ghost normal-case text-xl"

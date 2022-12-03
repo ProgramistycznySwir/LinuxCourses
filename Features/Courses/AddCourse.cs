@@ -39,11 +39,11 @@ public class NewCourseResponse : SuccessResponse
 [ApiController]
 [Authorize(Roles = AppRole.CanCreateCourses_AndAbove, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Validate]
-public class CreateCourse : ControllerBase
+public class AddCourse : ControllerBase
 {
 	private readonly ICourseRepository _courses;
 
-	public CreateCourse(ICourseRepository courses)
+	public AddCourse(ICourseRepository courses)
 	{
 		_courses = courses;
 	}
