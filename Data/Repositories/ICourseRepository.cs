@@ -12,7 +12,7 @@ namespace LinuxCourses.Data.Services;
 
 public interface ICourseRepository
 {
-	Task Create(Course course);
+	Task<Course> Create(Course course);
 	Task<List<Course>> GetAllIn(Guid categoryId);
 	Task<Quiz?> Get(Guid id);
 	Task Remove(Guid id);
@@ -32,7 +32,7 @@ public class CourseRepository : ICourseRepository
 		_categories = mongo.Categories();
 	}
 
-	public async Task Create(Course course)
+	public async Task<Course> Create(Course course)
 	{
 		course.Id = Guid.NewGuid();
 		var query = Query<CourseCategory>
@@ -41,6 +41,7 @@ public class CourseRepository : ICourseRepository
 		var updatedCategory = await _categories.FindOneAndUpdateAsync(query, query);
 		course.CategoryId = updatedCategory.Id;
 		await _courses.InsertOneAsync(course);
+		return course;
 	}
 
 	public Task<Quiz?> Get(Guid id)

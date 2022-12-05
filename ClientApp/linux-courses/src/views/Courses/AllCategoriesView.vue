@@ -4,7 +4,7 @@
   </div> -->
   <div class="mx-40 my-10">
     <div class="card bg-base-200 w-full">
-      <h1 class="text-3xl justify-start">Kategorie kursów:</h1>
+      <h1 class="justify-start">Kategorie kursów:</h1>
 
       <div v-if="courseCategories_loading" class="justify-center">
         <div

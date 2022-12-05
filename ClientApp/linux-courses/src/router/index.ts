@@ -8,6 +8,10 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView,
   },
   {
+    path: "/404",
+    component: () => import("@/views/error/NotFoundView.vue"),
+  },
+  {
     path: "/about",
     name: "about",
     // route level code-splitting
@@ -21,6 +25,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/auth/LoginView.vue"),
   },
   {
+    path: "/auth/register",
+    component: () => import("../views/auth/RegisterView.vue"),
+  },
+  {
+    path: "/auth/unauthorized",
+    component: () => import("../views/auth/UnauthorizedView.vue"),
+  },
+  {
     path: "/categories/:id",
     component: () => import("../views/Courses/CategoryView.vue"),
   },
@@ -28,14 +40,15 @@ const routes: Array<RouteRecordRaw> = [
     path: "/categories",
     component: () => import("../views/Courses/AllCategoriesView.vue"),
   },
+
+  {
+    path: "/course/new",
+    component: () => import("../views/Courses/NewCourseView.vue"),
+  },
   // {
   //   path: "/courses/:categoryId",
   //   component: () => import("../views/All.vue"),
   // },
-  {
-    path: "/auth/register",
-    component: () => import("../views/auth/RegisterView.vue"),
-  },
 ];
 
 const router = createRouter({
@@ -44,15 +57,26 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  if (to.matched.length < 1) {
+    next(false);
+    router.push("/404");
+  }
+
   if (from.path == "/auth/login") next();
-  const publicPages = ["/auth/login", "/auth/register", "/home"];
+  const publicPages = [
+    "/auth/login",
+    "/auth/register",
+    "/auth/unauthorized",
+    "/",
+    "/404",
+  ];
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem("user");
 
   // trying to access a restricted page + not logged in
   // redirect to login page
   if (authRequired && !loggedIn) {
-    next("/auth/login");
+    next("/auth/unauthorized");
   } else {
     next();
   }

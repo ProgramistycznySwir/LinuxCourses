@@ -14,15 +14,36 @@
         Pobieram informacje o kategorii z API...
       </div>
     </div>
-    <div v-else class="w-fit">
-      <div
-        v-for="course in category.courses"
-        v-bind:key="course.id"
-        class="my-5 bg-primary card px-10 py-2 text-xl"
-      >
-        <router-link :to="`/categories/${course.id}`" class="card w-32 h-40">
-          {{ course.name }}
-        </router-link>
+    <div v-else class="my-10">
+      <div>
+        <div
+          v-if="userRoles && userRoles.includes(AUTH_ROLES.CAN_CREATE_COURSES)"
+          class="justify-center"
+        >
+          <router-link
+            :to="{ path: '/course/new', params: { categoryId: categoryId } }"
+            class="btn btn-primary text-xl"
+          >
+            Dodaj kurs
+          </router-link>
+        </div>
+        <h2 class="justify-start">Lista kursów:</h2>
+        <div class="w-fit">
+          <div
+            v-if="category.courses.length > 0"
+            v-for="course in category.courses"
+            v-bind:key="course.id"
+            class="my-5 bg-primary card px-10 py-2 text-xl"
+          >
+            <router-link
+              :to="`/categories/${course.id}`"
+              class="card w-32 h-40"
+            >
+              {{ course.name }} [TODO]
+            </router-link>
+          </div>
+          <div v-else>W tej kategorii nie ma żadnych kursów.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -31,6 +52,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios-observable";
+import JwtService from "@/services/jwt.service";
+import AuthRoles from "@/models/AuthRoles";
 
 interface ResponseCourse {
   id: string;
@@ -58,6 +81,13 @@ export default defineComponent({
   computed: {
     categoryId() {
       return this.$route.params.id;
+    },
+    userRoles() {
+      return JwtService.roles(this.$store.state.auth.user);
+    },
+    // TODO: Move consts to plugin.
+    AUTH_ROLES() {
+      return AuthRoles;
     },
   },
   mounted() {

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using LinuxCourses.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -20,8 +21,7 @@ public interface ICourseCategoryReporitory
 	Task<CourseCategory?> Get(Guid id);
 
 	Task Update(Guid id, CourseCategory category);
-	Task AddCourse(Guid categoryId, Guid courseId);
-	Task RemoveCourse(Guid categoryId, Guid courseId);
+	Task MoveCourse(Guid courseId, Guid parentCategoryId);
 	Task MoveToCategory(Guid categoryId, Guid? parentCategoryId);
 
 	Task Remove(Guid id);
@@ -38,11 +38,46 @@ public class CourseCategoryReporitory : ICourseCategoryReporitory
 		_courses = mongo.Courses();
 	}
 
-	public async Task AddCourse(Guid categoryId, Guid courseId)
+	// public async Task MoveCourse(Guid courseId, Guid parentCategoryId);
+	// {
+	// 	// First: Change category of course.
+	// 	var courseQuery = Query<Course>.WithId(courseId);
+	// 	Course course = await _courses.GetFirst(courseQuery);
+
+	// 	if(course.CategoryId is Guid oldCategoryId)
+	// 	{
+	// 		// Remove course from category.
+	// 		var remove = Query<CourseCategory>
+	// 			.WithId(oldCategoryId)
+	// 			.WithUpdate(b => b.Pull(nameof(CourseCategory.Courses), course.Id));
+			
+	// 		await _categories.FindOneAndUpdateAsync(remove, remove);
+	// 	}
+
+	// 	// Add course to category.
+	// 	// TODO: Convert to Fluent Queries.
+	// 	var add_filter_ = Builders<CourseCategory>.Filter.Eq(nameof(CourseCategory.Id), categoryId);
+	// 	var add_update_ = Builders<CourseCategory>.Update.Push(nameof(CourseCategory.Courses), course.Id);
+	// 	await _categories.FindOneAndUpdateAsync(add_filter_, add_update_);
+
+	// 	// And last: Add category to course.
+	// 	var addToCourse_update_ = Builders<Course>.Update.Set(nameof(Course.CategoryId), categoryId);
+	// 	await _courses.FindOneAndUpdateAsync(courseQuery, addToCourse_update_);
+	// }
+
+	public async Task MoveCourse(Guid courseId, Guid parentCategoryId)
 	{
 		// First: Change category of course.
-		var courseQuery = Query<Course>.WithId(courseId);
-		Course course = await _courses.GetFirst(courseQuery);
+		Course course = await _courses.GetFirst(courseId);
+
+		// Add course to category.
+		var addToCategory = Query<CourseCategory>
+			.WithId(parentCategoryId)
+			.WithUpdate(b => b.Push(e => e.Courses, course.Id));
+		var newCategory = await _categories.FindOneAndUpdateAsync(addToCategory, addToCategory);
+
+		if(newCategory is null)
+			throw new ArgumentException("There is no category with this id.", nameof(parentCategoryId));
 
 		if(course.CategoryId is Guid oldCategoryId)
 		{
@@ -54,15 +89,9 @@ public class CourseCategoryReporitory : ICourseCategoryReporitory
 			await _categories.FindOneAndUpdateAsync(remove, remove);
 		}
 
-		// Add course to category.
-		// TODO: Convert to Fluent Queries.
-		var add_filter_ = Builders<CourseCategory>.Filter.Eq(nameof(CourseCategory.Id), categoryId);
-		var add_update_ = Builders<CourseCategory>.Update.Push(nameof(CourseCategory.Courses), course.Id);
-		await _categories.FindOneAndUpdateAsync(add_filter_, add_update_);
-
 		// And last: Add category to course.
-		var addToCourse_update_ = Builders<Course>.Update.Set(nameof(Course.CategoryId), categoryId);
-		await _courses.FindOneAndUpdateAsync(courseQuery, addToCourse_update_);
+		var updateCourse = Query<Course>.WithId(courseId).WithUpdate(b => b.Set(e => e.CategoryId, parentCategoryId));
+		await _courses.FindOneAndUpdateAsync(updateCourse, updateCourse);
 	}
 
 	public async Task Create(CourseCategory category)
@@ -125,33 +154,3 @@ public class CourseCategoryReporitory : ICourseCategoryReporitory
 		await _categories.FindOneAndUpdateAsync(add, add);
 	}
 }
-
-// public class CourseRepository : ICourseRepository
-// {
-// 	private readonly IMongoCollection<Quiz> _quizes;
-// 	private readonly IMongoCollection<Course> _course;
-
-// 	public CourseRepository(IMongoDb mongo)
-// 	{
-// 		_quizes = mongo.Quizes();
-// 		_course = mongo.Courses();
-// 	}
-
-// 	public async Task<List<Course>> GetAllAsync()
-// 	{
-// 		var fields_ = Builders<Course>.Projection.Include(e => e.Id).Include(e => e.Name);
-// 		return await _course.Find(_ => true).Project<Course>(fields_).ToListAsync();
-// 	}
-
-// 	public async Task<Quiz?> GetAsync(Guid id) =>
-// 		await _course.Find(x => x.Id == id).FirstOrDefaultAsync();
-
-// 	public async Task CreateAsync(Quiz newBook) =>
-// 		await _quizes.InsertOneAsync(newBook);
-
-// 	public async Task UpdateAsync(Guid id, Quiz quiz) =>
-// 		await _quizes.ReplaceOneAsync(x => x.Id == id, quiz);
-
-// 	public async Task RemoveAsync(Guid id) =>
-// 		await _quizes.DeleteOneAsync(x => x.Id == id);
-// }
